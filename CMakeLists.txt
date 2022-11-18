@@ -1,13 +1,34 @@
+cmake_minimum_required(VERSION 3.22)
 project(valac)
-
-cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true)
 
 include_directories("gee" "vala" "ccode" "codegen" "gobject-introspection" "./")
 
+add_library(GLIB2 SHARED IMPORTED)
+set_property(TARGET GLIB2 PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+    c:/gnome/include/glib-2.0 
+    c:/gnome/lib/glib-2.0/include)
+set_target_properties(GLIB2 PROPERTIES
+ IMPORTED_LOCATION c:/gnome/bin/glib-2.0-0.dll
+ IMPORTED_IMPLIB c:/gnome/lib/glib-2.0.lib
+)
+
+add_library(GO SHARED IMPORTED)
+set_target_properties(GO PROPERTIES
+ IMPORTED_LOCATION c:/gnome/bin/gobject-2.0-0.dll
+ IMPORTED_IMPLIB c:/gnome/lib/gobject-2.0.lib
+)
+
+add_library(GMODULE SHARED IMPORTED)
+set_target_properties(GMODULE PROPERTIES
+ IMPORTED_LOCATION c:/gnome/bin/gmodule-2.0-0.dll
+ IMPORTED_IMPLIB c:/gnome/lib/gmodule-2.0.lib
+)
+
 file(GLOB GEE_SRC "./gee/*.c")
 add_library(gee SHARED ${GEE_SRC})
+target_link_libraries(gee PUBLIC GLIB2 GO GMODULE)
 
 file(GLOB VALA_SRC "./vala/*.c")
 add_library(vala SHARED ${VALA_SRC})
@@ -27,7 +48,8 @@ target_link_libraries(valac gee vala ccode codegen)
 
 file(GLOB GOBJECT_INTROSPECTION_SRC "./gobject-introspection/*.c")
 add_library(gidl ${GOBJECT_INTROSPECTION_SRC})
-add_executable(gobject-introspect ${GOBJECT_INTROSPECTION_SRC})
+target_link_libraries(gidl PUBLIC GLIB2)
+# add_executable(gobject-introspect ${GOBJECT_INTROSPECTION_SRC})
 
 set(VAPIGEN_SRC 
     "./vapigen/valavapigen.c"
