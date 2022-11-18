@@ -2,28 +2,29 @@ cmake_minimum_required(VERSION 3.22)
 project(valac)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true)
+# set(PREFIX C:/gnome)
 
 include_directories("gee" "vala" "ccode" "codegen" "gobject-introspection" "./")
 
 add_library(GLIB2 SHARED IMPORTED)
 set_property(TARGET GLIB2 PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-    c:/gnome/include/glib-2.0 
-    c:/gnome/lib/glib-2.0/include)
+    ${CMAKE_INSTALL_PREFIX}/include/glib-2.0 
+    ${CMAKE_INSTALL_PREFIX}/lib/glib-2.0/include)
 set_target_properties(GLIB2 PROPERTIES
- IMPORTED_LOCATION c:/gnome/bin/glib-2.0-0.dll
- IMPORTED_IMPLIB c:/gnome/lib/glib-2.0.lib
+#  IMPORTED_LOCATION ${PREFIX}/bin/glib-2.0-0.dll
+ IMPORTED_IMPLIB ${CMAKE_INSTALL_PREFIX}/lib/glib-2.0.lib
 )
 
 add_library(GO SHARED IMPORTED)
 set_target_properties(GO PROPERTIES
- IMPORTED_LOCATION c:/gnome/bin/gobject-2.0-0.dll
- IMPORTED_IMPLIB c:/gnome/lib/gobject-2.0.lib
+#  IMPORTED_LOCATION ${PREFIX}/bin/gobject-2.0-0.dll
+ IMPORTED_IMPLIB ${CMAKE_INSTALL_PREFIX}/lib/gobject-2.0.lib
 )
 
 add_library(GMODULE SHARED IMPORTED)
 set_target_properties(GMODULE PROPERTIES
- IMPORTED_LOCATION c:/gnome/bin/gmodule-2.0-0.dll
- IMPORTED_IMPLIB c:/gnome/lib/gmodule-2.0.lib
+#  IMPORTED_LOCATION ${PREFIX}/bin/gmodule-2.0-0.dll
+ IMPORTED_IMPLIB ${CMAKE_INSTALL_PREFIX}/lib/gmodule-2.0.lib
 )
 
 file(GLOB GEE_SRC "./gee/*.c")
@@ -62,3 +63,5 @@ set(VAPIGEN_SRC
     "./vapigen/valagidlparser.c")
 add_executable(vapicheck ${VAPIGEN_SRC})
 target_link_libraries(vapicheck gee vala gidl)
+
+install(TARGETS valac vapicheck vapigen gee vala ccode codegen)
